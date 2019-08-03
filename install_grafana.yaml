@@ -1,0 +1,14 @@
+---
+  - name: Configure timezone
+    hosts: all
+    become: true
+    roles:
+      - role: timezone
+
+  - name: Install grafana
+    hosts: grafana
+    become: true
+    roles:
+      - role: grafana
+        vars:
+          grafana_version: "6.0.1"

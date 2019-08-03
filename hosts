@@ -1,0 +1,9 @@
+[all:vars]
+ansible_connection=ssh
+ansible_user=$USER
+ansible_ssh_pass=$USER_PW
+ansible_sudo_pass=$USER_PW
+
+
+[grafana]
+XX.XXX.XX.XX

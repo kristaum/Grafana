@@ -1,0 +1,47 @@
+---
+- name: Install grafana package
+  yum:
+    name:  "https://dl.grafana.com/oss/release/grafana-{{ grafana_version }}-1.x86_64.rpm"
+    state: present
+  register: install_grafana
+
+- name: Enable service on boot and start it
+  systemd:
+    name:           grafana-server
+    daemon_reload:  yes
+    enabled:        yes
+    state:          restarted
+  when: install_grafana is success
+  register: grafana_installed
+
+- name: Install/update epel-release package
+  yum:
+    name:  epel-release
+    state: present
+  when: grafana_installed is success
+  register: update_epel
+
+- name: Install install nginx
+  yum:
+    name:  nginx
+    state: present
+  when: update_epel is success
+  register: install_nginx
+
+- name: Copy grafana.conf with nginx configuration
+  copy:
+    src:    files/grafana.conf
+    dest:   /etc/nginx/conf.d/grafana.conf
+    owner:  root
+    group:  root
+    mode:   '0644'
+  when: install_nginx is success
+  register: config_grafana_nginx
+
+- name: Enable service on boot and start it
+  systemd:
+    name:           nginx
+    daemon_reload:  yes
+    enabled:        yes
+    state:          restarted
+  when: config_grafana_nginx is success
